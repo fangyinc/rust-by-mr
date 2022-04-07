@@ -1,0 +1,86 @@
+syntax = "proto3";
+package task;
+
+
+enum TaskType {
+  MAP = 0;
+  REDUCE = 1;
+}
+
+enum TaskState {
+  PENDING = 0;
+  RUNNING = 1;
+  SUCCEEDED = 2;
+  FAILED = 3;
+}
+
+enum JobState {
+  JOB_ACCEPTED = 0;
+  JOB_MAP_RUNNING = 1;
+  JOB_REDUCE_PENDING = 2;
+  JOB_REDUCE_RUNNING = 3;
+  JOB_SUCCEEDED = 4;
+  JOB_FAILED = 5;
+}
+
+service TaskRpc {
+  // Register worker to master
+  rpc RegisterWorker (RegisterWorkerRequest) returns (RegisterWorkerReply);
+
+  // Send request to master for ask task to run
+  rpc AskTaskToRun (TaskRunRequest) returns (TaskRunReply);
+
+  // Task state change message
+  rpc TaskStateChange (TaskStateRequest) returns (TaskStateReply);
+}
+
+message TaskDesc {
+  string id = 1;
+  TaskType task_type = 2;
+  repeated string input_files = 3;
+  repeated string output_files = 4;
+  uint32 reduce_num = 5;
+}
+
+message TaskInfo {
+  string id = 1;
+  TaskType task_type = 2;
+  TaskState state = 3;
+  string start_time = 4;
+  string end_time = 5;
+  string worker_id = 6;
+}
+
+message TaskRunRequest {
+  string worker_id = 1;
+}
+
+message TaskRunReply {
+  TaskDesc task = 1;
+}
+
+message TaskStateRequest {
+  TaskInfo task = 1;
+}
+
+message TaskStateReply {
+
+}
+
+message WorkerInfo {
+  string id = 1;
+  string address = 2;
+  uint32 total_memory = 3;
+  uint32 used_memory = 4;
+  uint32 total_cpu = 5;
+  uint32 used_cpu = 6;
+}
+
+message RegisterWorkerRequest {
+  WorkerInfo worker = 1;
+}
+
+message RegisterWorkerReply {
+
+}
+
